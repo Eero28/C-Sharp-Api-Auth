@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UserAuth.Entities
-{
+{   //table
     [Table("Users")]
     public class User
     {
