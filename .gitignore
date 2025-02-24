@@ -1,0 +1,53 @@
+# Build output
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.log
+appsettings.json
+# User-specific settings
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet packages
+*.nupkg
+packages/
+project.lock.json
+project.assets.json
+.nuget/
+
+# ASP.NET Core & Entity Framework
+appsettings.Development.json
+secrets.json
+Migrations/
+
+# Logs & cache
+logs/
+*.log
+*.tlog
+*.cache
+coverage/
+TestResults/
+node_modules/
+npm-debug.log
+yarn.lock
+dist/
+wwwroot/lib/
+
+# Visual Studio specific
+.vs/
+*.csproj.user
+*.dbmdl
+*.jfm
+
+# Docker
+docker-compose.override.yml
+
+# Rider IDE (JetBrains)
+.idea/
+*.iml
