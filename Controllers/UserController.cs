@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using UserAuth.Database;
 using UserAuth.Entities;
 using UserAuth.Helpers;
+using UserAuth.Dto;
 
 namespace UserAuth.Controllers
 {
@@ -18,7 +19,7 @@ namespace UserAuth.Controllers
         [HttpGet]
         public async Task<ActionResult> GetUsers()
         {
-            var users = await _dbContext.Users.ToListAsync();
+            var users = await _dbContext.Users.Include(r => r.Reviews).ToListAsync();
             return Ok(users); 
         }
 
@@ -36,30 +37,36 @@ namespace UserAuth.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateUser([FromBody] User user)
+        public async Task<ActionResult> CreateUser([FromBody] UserDTO UserDTO)
         {
-            if (string.IsNullOrWhiteSpace(user.Username) ||
-                string.IsNullOrWhiteSpace(user.Email) ||
-                string.IsNullOrWhiteSpace(user.Password))
+            if (string.IsNullOrWhiteSpace(UserDTO.Username) ||
+                string.IsNullOrWhiteSpace(UserDTO.Email) ||
+                string.IsNullOrWhiteSpace(UserDTO.Password))
             {
                 return BadRequest("Fill all fields!");
             }
 
             var existingUser = await _dbContext.Users
-                .FirstOrDefaultAsync(x => x.Username == user.Username || x.Email == user.Email);
+                .FirstOrDefaultAsync(x => x.Username == UserDTO.Username || x.Email == UserDTO.Email);
 
             if (existingUser != null)
             {
                 return BadRequest("User already exists");
             }
 
-            var hashedPassword = HelperFunc.PasswordHash(user.Password);
-            user.Password = hashedPassword;
+            var hashedPassword = HelperFunc.PasswordHash(UserDTO.Password);
+
+            var user = new User
+            {
+                Username = UserDTO.Username,
+                Email = UserDTO.Email,
+                Password = UserDTO.Password
+            };
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUserById), new { Id_user = user.Id_user }, "User created successfully");
+            return CreatedAtAction(nameof(GetUserById), new { Id_user = user.Id_user }, user);
         }
 
 

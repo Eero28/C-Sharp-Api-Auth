@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace UserAuth.Entities
-{   //table
+{
     [Table("Users")]
     public class User
     {
@@ -16,6 +17,7 @@ namespace UserAuth.Entities
         public required string Password { get; set; }
         [Column("username")]
         public required string Username { get; set; }
+        public List<Review> Reviews { get; set; } = new List<Review>(); 
 
     }
 }
