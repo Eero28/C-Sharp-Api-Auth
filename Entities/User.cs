@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace UserAuth.Entities
 {
@@ -11,13 +10,19 @@ namespace UserAuth.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id_user")]
         public int Id_user { get; set; }
-        [Column("email")]
-        public required string Email { get; set; }
-        [Column("password")]
-        public required string Password { get; set; }
-        [Column("username")]
-        public required string Username { get; set; }
-        public List<Review> Reviews { get; set; } = new List<Review>(); 
 
+        [Column("email")]
+        [Required] 
+        public string Email { get; set; } = string.Empty;
+
+        [Column("password")]
+        [Required]  
+        public string Password { get; set; } = string.Empty;
+
+        [Column("username")]
+        [Required]  
+        public string Username { get; set; } = string.Empty;
+
+        public List<Review> Reviews { get; set; } = new List<Review>();
     }
 }

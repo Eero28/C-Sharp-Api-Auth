@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using UserAuth.Database;
-using UserAuth.Entities;
-using UserAuth.Helpers;
+using UserAuth.Services;
 using UserAuth.Dto;
+using UserAuth.Entities;
 
 namespace UserAuth.Controllers
 {
@@ -11,22 +9,24 @@ namespace UserAuth.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly DatabaseContext _dbContext;
+        private readonly UserService _userService;
 
-        public UserController(DatabaseContext dbContext) =>
-            _dbContext = dbContext;
+        public UserController(UserService userService)
+        {
+            _userService = userService;
+        }
 
         [HttpGet]
         public async Task<ActionResult> GetUsers()
         {
-            var users = await _dbContext.Users.Include(r => r.Reviews).ToListAsync();
-            return Ok(users); 
+            var users = await _userService.GetUsersAsync();
+            return Ok(users);
         }
 
         [HttpGet("{Id_user}")]
         public async Task<ActionResult> GetUserById(int Id_user)
         {
-            var user = await _dbContext.Users.FindAsync(Id_user);
+            var user = await _userService.GetUserByIdAsync(Id_user);
 
             if (user == null)
             {
@@ -37,78 +37,36 @@ namespace UserAuth.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateUser([FromBody] UserDTO UserDTO)
+        public async Task<ActionResult> CreateUser([FromBody] UserDTO userDTO)
         {
-            if (string.IsNullOrWhiteSpace(UserDTO.Username) ||
-                string.IsNullOrWhiteSpace(UserDTO.Email) ||
-                string.IsNullOrWhiteSpace(UserDTO.Password))
+            var result = await _userService.CreateUserAsync(userDTO);
+            if (result == "User created successfully")
             {
-                return BadRequest("Fill all fields!");
+                return Ok(result);
             }
-
-            var existingUser = await _dbContext.Users
-                .FirstOrDefaultAsync(x => x.Username == UserDTO.Username || x.Email == UserDTO.Email);
-
-            if (existingUser != null)
-            {
-                return BadRequest("User already exists");
-            }
-
-            var hashedPassword = HelperFunc.PasswordHash(UserDTO.Password);
-
-            var user = new User
-            {
-                Username = UserDTO.Username,
-                Email = UserDTO.Email,
-                Password = UserDTO.Password
-            };
-
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUserById), new { Id_user = user.Id_user }, user);
+            return BadRequest(result);
         }
-
 
         [HttpPut("{Id_user}")]
         public async Task<ActionResult> UpdateUser(int Id_user, [FromBody] User user)
         {
-            if (string.IsNullOrWhiteSpace(user.Username) ||
-                string.IsNullOrWhiteSpace(user.Email) ||
-                string.IsNullOrWhiteSpace(user.Password))
+            var result = await _userService.UpdateUserAsync(Id_user, user);
+            if (result == "User updated successfully")
             {
-                return BadRequest("Fill all fields!");
+                return Ok(result);
             }
-
-            var existingUser = await _dbContext.Users.FindAsync(Id_user);
-
-            if (existingUser == null)
-            {
-                return NotFound("User not found");
-            }
-
-            existingUser.Username = user.Username;
-            existingUser.Email = user.Email;
-            existingUser.Password = user.Password;
-
-            await _dbContext.SaveChangesAsync();
-
-            return Ok("User updated successfully");
+            return BadRequest(result);
         }
 
         [HttpDelete("{Id_user}")]
         public async Task<ActionResult> DeleteUser(int Id_user)
         {
-            var existingUser = await _dbContext.Users.FindAsync(Id_user);
-            if (existingUser is null)
+            var result = await _userService.DeleteUserAsync(Id_user);
+            if (result == "User deleted successfully")
             {
-                return NotFound("User not found");
+                return Ok(result);
             }
-
-            _dbContext.Users.Remove(existingUser);
-            await _dbContext.SaveChangesAsync();
-
-            return Ok("User deleted successfully");
+            return NotFound(result);
         }
     }
 }

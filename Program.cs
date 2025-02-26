@@ -1,11 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UserAuth.Database;
+using UserAuth.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// add services
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ReviewService>();
+
+// add controllers
 builder.Services.AddControllers();
+
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",

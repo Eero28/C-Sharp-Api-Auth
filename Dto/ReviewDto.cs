@@ -1,17 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-public class ReviewDto
+﻿namespace UserAuth.Dto
 {
-    public required string ReviewName { get; set; }
+    using System.ComponentModel.DataAnnotations;
 
-    [Range(1, 5)] 
-    public required float ReviewRating { get; set; }
+    public class ReviewDto
+    {
+        [Required(ErrorMessage = "Review name is required.")]
+        public string ReviewName { get; set; } = string.Empty;
 
-    public required string ReviewDescription { get; set; }
+        [Range(1, 5, ErrorMessage = "Review rating must be between 1 and 5.")]
+        [Required(ErrorMessage = "Review rating is required.")]
+        public float ReviewRating { get; set; }
 
-    public required string ImageUrl { get; set; }
-  
-    public required string Category { get; set; }
+        [Required(ErrorMessage = "Review description is required.")]
+        public string ReviewDescription { get; set; } = string.Empty;
 
-    public required int UserId { get; set; }
+        [Required(ErrorMessage = "Image URL is required.")]
+        public string ImageUrl { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Category is required.")]
+        public string Category { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "UserId is required.")]
+        public int UserId { get; set; }
+    }
 }

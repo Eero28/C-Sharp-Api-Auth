@@ -13,32 +13,34 @@ namespace UserAuth.Entities
         public int Id_review { get; set; }
 
         [Column("reviewName")]
-        public required string ReviewName { get; set; }
+        [Required]
+        public string ReviewName { get; set; } = string.Empty;
 
         [Column("reviewRating")]
-        public required float ReviewRating { get; set; }
+        [Required]
+        public float ReviewRating { get; set; }
 
         [Column("reviewDescription")]
-        public required string ReviewDescription { get; set; }
-        
+        [Required]
+        public string ReviewDescription { get; set; } = string.Empty;
+
         [Column("imageUrl")]
-        public required string ImageUrl { get; set; }
+        [Required]
+        public string ImageUrl { get; set; } = string.Empty;
 
         [Column("category")]
-        public required string Category { get; set; }
+        [Required]
+        public string Category { get; set; } = string.Empty;
 
         [Column("createdAt")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // FK
         [ForeignKey("User")]
         [Column("user_id")]
         public int UserId { get; set; }
 
         [JsonIgnore]
-        public User User { get; set; }
-        
-
+        public User User { get; set; } = new User();
     }
 }

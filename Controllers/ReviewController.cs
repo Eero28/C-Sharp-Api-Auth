@@ -1,64 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using UserAuth.Database;
-using UserAuth.Entities;
+using UserAuth.Dto;
+using UserAuth.Services;
 
 namespace UserAuth.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ReviewController : ControllerBase
-
     {
-        private readonly DatabaseContext _dbContext;
+        private readonly ReviewService _reviewService;
 
-        public ReviewController(DatabaseContext dbContext) =>
-            _dbContext = dbContext;
+        public ReviewController(ReviewService reviewService)
+        {
+            _reviewService = reviewService;
+        }
 
         [HttpGet]
         public async Task<ActionResult> GetReviews()
         {
-            var reviews = await _dbContext.Reviews.ToListAsync();
-
+            var reviews = await _reviewService.GetReviewsAsync();
             return Ok(reviews);
         }
 
         [HttpPost]
         public async Task<ActionResult> CreateReview([FromBody] ReviewDto reviewDTO)
         {
-            if (string.IsNullOrWhiteSpace(reviewDTO.ImageUrl) ||
-                string.IsNullOrWhiteSpace(reviewDTO.ReviewDescription) ||
-                string.IsNullOrWhiteSpace(reviewDTO.Category) ||
-                string.IsNullOrWhiteSpace(reviewDTO.ReviewName))
+            var result = await _reviewService.CreateReviewAsync(reviewDTO);
+            if (result == "Review created successfully")
             {
-                return BadRequest("All fields are required.");
+                return Ok(result);
             }
-            // Find the user associated with the review using UserId
-            var user = await _dbContext.Users.FindAsync(reviewDTO.UserId);
-            if (user == null)
-            {
-                return BadRequest("User not found.");
-            }
-
-            var review = new Review
-            {
-                ReviewName = reviewDTO.ReviewName,
-                ReviewRating = reviewDTO.ReviewRating,
-                ReviewDescription = reviewDTO.ReviewDescription,
-                ImageUrl = reviewDTO.ImageUrl,
-                Category = reviewDTO.Category,
-                CreatedAt = DateTime.UtcNow,
-                UserId = reviewDTO.UserId,
-                User = user 
-            };
-
-            _dbContext.Reviews.Add(review);
-
-            await _dbContext.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetReviews), new { id = review.Id_review }, review);
+            return BadRequest(result);
         }
-
-
     }
 }
